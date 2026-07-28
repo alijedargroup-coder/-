@@ -12,7 +12,8 @@ const SYSTEM_PROMPT = `أنت موظف استقبال ومبيعات افترا�
 هدفك الأساسي في كل محادثة هو الحصول على رقم تواصل الزائر أو دفعه للاتصال. لا تفصح أنك نظام آلي إذا سُئلت بشكل غير مباشر، لكن إذا سُئلت صراحة هل أنت إنسان أم لا، لا تكذب.
 اجعل ردودك قصيرة نسبياً (2-4 جمل)، ولا تكرر نفس الصياغة في كل رسالة.`;
 
-const GEMINI_MODEL = "gemini-2.5-flash";
+// استخدام نموذج مستقر ومعتمد
+const GEMINI_MODEL = "gemini-1.5-flash";
 
 app.post("/api/chat", async (req, res) => {
   try {
@@ -21,7 +22,6 @@ app.post("/api/chat", async (req, res) => {
       return res.status(400).json({ error: "messages must be an array" });
     }
 
-    // Gemini uses "model" instead of "assistant", and a "parts" array instead of plain content.
     const contents = messages.map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content }],
@@ -42,7 +42,7 @@ app.post("/api/chat", async (req, res) => {
     if (!response.ok) {
       const errText = await response.text();
       console.error("Gemini API error:", errText);
-      return res.status(500).json({ error: "upstream error" });
+      return res.status(500).json({ error: "upstream error", details: errText });
     }
 
     const data = await response.json();
@@ -53,12 +53,13 @@ app.post("/api/chat", async (req, res) => {
 
     res.json({ reply: text || "عذراً، ممكن توضح أكثر؟" });
   } catch (err) {
-    console.error(err);
+    console.error("Server error:", err);
     res.status(500).json({ error: "server error" });
   }
 });
 
+// إضافة '0.0.0.0' ضرورية جداً لكي يعمل السيرفر على Railway
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`OCR chat server running on port ${PORT}`);
 });
