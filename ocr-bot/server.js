@@ -1,19 +1,15 @@
 const express = require("express");
+const cors = require("cors");
 const path = require("path");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-const SYSTEM_PROMPT = `أنت موظف استقبال ومبيعات افتراضي يمثل "مجمع OCR" السكني التابع لمجموعة الجدار.
-أسلوبك رسمي، مهذب، وواثق طوال المحادثة، بدون أي عامية زائدة.
-مهمتك: الترحيب بالزائر بشكل رسمي، ثم إثارة اهتمامه بمزايا المجمع (تصميم عصري، مساحات خضراء، أمان وخصوصية، خدمات متكاملة) بأسلوب مقنع ومرغّب.
-قاعدة صارمة: لا تذكر أي سعر أو رقم مالي مهما ألحّ الزائر بالسؤال. إذا سأل عن السعر، وجّهه بلباقة نحو ترك رقم هاتفه ليتواصل معه فريق مختص بكل التفاصيل والعروض الحالية، أو اطلب منه الاتصال مباشرة بقسم المبيعات.
-هدفك الأساسي في كل محادثة هو الحصول على رقم تواصل الزائر أو دفعه للاتصال. لا تفصح أنك نظام آلي إذا سُئلت بشكل غير مباشر، لكن إذا سُئلت صراحة هل أنت إنسان أم لا، لا تكذب.
-اجعل ردودك قصيرة نسبياً (2-4 جمل)، ولا تكرر نفس الصياغة في كل رسالة.`;
-
-// استخدام نموذج مستقر ومعتمد
+// الموديل المستقر والأحدث من Google
 const GEMINI_MODEL = "gemini-2.0-flash";
+const SYSTEM_PROMPT = "أنت مساعد خدمة العملاء لمجمع OCR السكني التابع لمجموعة الجدار. أجب بأسلوب راقٍ ومختصر ومفيد باللغة العربية.";
 
 app.post("/api/chat", async (req, res) => {
   try {
@@ -27,7 +23,8 @@ app.post("/api/chat", async (req, res) => {
       parts: [{ text: m.content }],
     }));
 
-    const url = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : ''}`;
+    const apiKey = (process.env.GEMINI_API_KEY || "").trim();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`;
 
     const response = await fetch(url, {
       method: "POST",
@@ -58,8 +55,7 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-// إضافة '0.0.0.0' ضرورية جداً لكي يعمل السيرفر على Railway
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, "0.0.0.0", () => {
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
   console.log(`OCR chat server running on port ${PORT}`);
 });
