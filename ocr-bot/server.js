@@ -6,7 +6,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 // الموديل السريع والمستقر من Google
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-1.5-flash";
 const SYSTEM_PROMPT = "أنت مساعد خدمة العملاء لمجمع OCR السكني التابع لمجموعة الجدار. أجب بأسلوب راقٍ ومختصر ومفيد باللغة العربية.";
 
 app.post("/api/chat", async (req, res) => {
