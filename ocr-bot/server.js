@@ -1,13 +1,11 @@
 const express = require("express");
-const cors = require("cors");
 const path = require("path");
 
 const app = express();
-app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// الموديل المستقر والأحدث من Google
+// الموديل السريع والمستقر من Google
 const GEMINI_MODEL = "gemini-2.0-flash";
 const SYSTEM_PROMPT = "أنت مساعد خدمة العملاء لمجمع OCR السكني التابع لمجموعة الجدار. أجب بأسلوب راقٍ ومختصر ومفيد باللغة العربية.";
 
