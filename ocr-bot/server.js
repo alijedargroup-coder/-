@@ -13,7 +13,7 @@ const SYSTEM_PROMPT = `أنت موظف استقبال ومبيعات افترا�
 اجعل ردودك قصيرة نسبياً (2-4 جمل)، ولا تكرر نفس الصياغة في كل رسالة.`;
 
 // استخدام نموذج مستقر ومعتمد
-const GEMINI_MODEL = "gemini-1.5-flash";
+const GEMINI_MODEL = "gemini-2.0-flash";
 
 app.post("/api/chat", async (req, res) => {
   try {
@@ -27,7 +27,7 @@ app.post("/api/chat", async (req, res) => {
       parts: [{ text: m.content }],
     }));
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : ''}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/${GEMINI_MODEL}:generateContent?key=${process.env.GEMINI_API_KEY ? process.env.GEMINI_API_KEY.trim() : ''}`;
 
     const response = await fetch(url, {
       method: "POST",
